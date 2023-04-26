@@ -1,0 +1,163 @@
+// This file contains a set of auxillary drivers. They are usefull/necessary
+// in some cases where the marker protocol doesn't provide enough information
+// to specify all degrees of freedom. Hence, these drivers complement a
+// specific driver protocol. Many of these drivers are soft, and an only serve
+// to stabalize the solver in postures where the markers doesn't provide unique
+// kinematic solution. 
+
+AnyFolder ExtraDrivers = {
+  
+  
+  // --------------------------------------------------------------------------
+  // The BM_MANNEQUIN drivers are used to support the degrees of freedom where
+  // the markers do not provide enough information. 
+  // See this file for options: #path HTML_DOC "<AMMR_PATH_DOC>/bm_config/index.html"
+  // --------------------------------------------------------------------------
+  #define BM_MANNEQUIN_DRIVER_WEAK_SWITCH ON
+  
+  Main.HumanModel.DefaultMannequinDrivers.DefaultWeakDriverWeight = 0.01;
+  
+  // These weak mannequin drivers control ankle eversion/inversion
+  #define BM_MANNEQUIN_DRIVER_ANKLE_SUBTALAR_EVERSION_LEFT ON
+  
+  
+   // These weak mannequin drivers control ankle eversion/inversion
+  #define BM_MANNEQUIN_DRIVER_ANKLE_SUBTALAR_EVERSION_RIGHT ON
+  
+  // This link to the mannequin drivers ensures they are picked up by the study.
+  AnyFolder& MannequinDrivers = Main.HumanModel.DefaultMannequinDrivers;
+  
+  #ifdef UpperBody
+
+      #ifdef STATIC_TRIAL
+         AnyFolder ElbowFlexionRight=    {
+          KinLimitsDriver Driver(
+          KinMeasure= Main.HumanModel.BodyModel.Interface.Right.ElbowFlexion
+          ) =  { LowerLimit =0; HighLimit =180; MeasureConversion=180/pi; };
+        };
+        
+        AnyFolder ElbowFlexionLeft =     {
+          KinLimitsDriver Driver(
+          KinMeasure= Main.HumanModel.BodyModel.Interface.Left.ElbowFlexion
+          ) =  { LowerLimit =0; HighLimit =180; MeasureConversion=180/pi; };
+        };
+      
+        AnyFolder WristFlexionRight=    {
+          KinLimitsDriver Driver(
+          KinMeasure= Main.HumanModel.BodyModel.Interface.Right.WristFlexion
+          ) =  { LowerLimit =-70; HighLimit =70; MeasureConversion=180/pi; };
+        };
+        
+        AnyFolder WristFlexionLeft=    {
+          KinLimitsDriver Driver(
+          KinMeasure= Main.HumanModel.BodyModel.Interface.Left.WristFlexion
+          ) =  { LowerLimit =-70; HighLimit =70; MeasureConversion=180/pi; };
+        };  
+
+        
+        
+         AnyFolder WristAbductionRight=    {
+          KinLimitsDriver Driver(
+          KinMeasure= Main.HumanModel.BodyModel.Interface.Right.WristAbduction
+          ) =  { LowerLimit =-50; HighLimit =40; MeasureConversion=180/pi; };
+        };
+        
+           AnyFolder WristAbductionLeft=    {
+          KinLimitsDriver Driver(
+          KinMeasure= Main.HumanModel.BodyModel.Interface.Left.WristAbduction
+          ) =  { LowerLimit =-50; HighLimit =40; MeasureConversion=180/pi; };
+        };  
+     
+
+        
+      #endif
+   
+         AnyFolder WristAbductionRightHigh=    {
+          KinLimitsDriver Driver(
+          KinMeasure= Main.HumanModel.BodyModel.Interface.Right.WristAbduction
+          ) =  { LowerLimit =-70; HighLimit =70; MeasureConversion=180/pi; };
+        };
+        
+           AnyFolder WristAbductionLeftHigh=    {
+          KinLimitsDriver Driver(
+          KinMeasure= Main.HumanModel.BodyModel.Interface.Left.WristAbduction
+          ) =  { LowerLimit =-70; HighLimit =70; MeasureConversion=180/pi; };
+        };  
+     
+      
+  #endif
+  
+  //Add extra drivers on the upper body in the absense of markers 
+  //idea is to keep head horizontal using lin measures... then driver spine with soft drivers.
+  #if Protocol == LowerBodyPlugInGait
+  
+  AnySeg &Skull = Main.HumanModel.BodyModel.Trunk.SegmentsCervicalSpine.SkullSeg;
+  Skull ={
+    AnyRefNode NodeFront = {sRel={0.2,0,0};};
+    AnyRefNode NodeRight = {sRel={0,0,0.2};};
+    AnyRefNode NodeLeft  = {sRel={0,0,-0.2};};
+  };
+  
+  AnyKinLinear NodeFront ={
+    Ref=0;
+    AnyRefFrame &ref1=    Main.EnvironmentModel.GlobalRef;
+    AnyRefFrame &ref2=   Main.HumanModel.BodyModel.Trunk.SegmentsCervicalSpine.SkullSeg.NodeFront;
+  };
+  
+  AnyKinLinear NodeRight ={
+    Ref=0;
+    AnyRefFrame &ref1=    Main.EnvironmentModel.GlobalRef;
+    AnyRefFrame &ref2=   Main.HumanModel.BodyModel.Trunk.SegmentsCervicalSpine.SkullSeg.NodeRight;
+  };
+  
+  AnyKinLinear NodeLeft={
+    Ref=0;
+    AnyRefFrame &ref1=    Main.EnvironmentModel.GlobalRef;
+    AnyRefFrame &ref2=   Main.HumanModel.BodyModel.Trunk.SegmentsCervicalSpine.SkullSeg.NodeLeft;
+  };
+  AnyKinEq EqualHeight_Front_Right ={
+    AnyKinMeasureLinComb Front_Right ={
+      AnyKinMeasureOrg zz={
+        MeasureOrganizer={2,5};
+        AnyKinLinear &ref1=...NodeRight;
+        AnyKinLinear &ref2=...NodeFront;
+      };
+      Coef={{1,-1}};
+      OutDim=1;
+    };
+    AnyKinMeasureLinComb Front_Left ={
+      AnyKinMeasureOrg zz={
+        MeasureOrganizer={2,5};
+        AnyKinLinear &ref1=...NodeLeft;
+        AnyKinLinear &ref2=...NodeFront;
+      };
+      Coef={{1,-1}};
+      OutDim=1;
+    };
+    Reaction.Type={Off,Off};
+  };
+  
+  
+  
+  #define BM_MANNEQUIN_DRIVER_SKULL_THORAX_FLEXION ON
+  //Switch for the mannequin driver being active or not
+  #define BM_MANNEQUIN_DRIVER_SKULL_THORAX_LATERALBENDING ON
+  
+  //Switch for the mannequin driver being active or not
+  #define BM_MANNEQUIN_DRIVER_SKULL_THORAX_ROTATION ON
+  
+  //Switch for the mannequin driver being active or not
+  #define BM_MANNEQUIN_DRIVER_PELVIS_THORAX_LATERAL_BENDING ON
+  
+  //Switch for the mannequin driver being active or not
+  #define BM_MANNEQUIN_DRIVER_PELVIS_THORAX_ROTATION ON
+  
+  //Switch for the mannequin driver being active or not
+  #define BM_MANNEQUIN_DRIVER_PELVIS_THORAX_EXTENSION ON
+  
+  
+  
+  #endif
+  
+   
+};

@@ -1,0 +1,114 @@
+#define UpperBody
+Main.ModelSetup.SubjectSpecificData = 
+{
+
+
+
+};
+
+// This sets the Anthropometrics for all trials for this subject
+Main.HumanModel.Anthropometrics = 
+{
+     BodyMass =65;
+     BodyHeight = 1.7;   
+   
+   // These antrhopometric data will be used as initial guess for 
+   // the optimization alogorithm for segment length. Default length 
+   // based on the subjects' height will be used if these values are obmitted. 
+   SegmentDimensions = 
+   {
+      PelvisWidth = DesignVar( 0.18); ///< distance between hip joints
+      HeadHeight = DesignVar( 0.14);///< height in neutral position from  C1HatNode to top of head
+      HeadDepth = DesignVar( 0.24);///< Distance from the most anterior point on the skull to the most posterior point on the skull(Edit)
+   
+      TrunkHeight = DesignVar( 0.56);///< height in neautral position from  C1HatNode to L5SacrumJnt
+       TrunkWidth = DesignVar( 0.45);///< height in neautral position from  C1HatNode to L5SacrumJnt
+      
+      Right =
+      {
+        ThighLength = DesignVar( 0.46); 
+        ShankLength = DesignVar( 0.45);
+        FootLength= DesignVar(0.24);
+        UpperArmLength = DesignVar( 0.30);
+        LowerArmLength = DesignVar(0.23);
+        HandLength = DesignVar( 0.182);
+        HandBreadth = DesignVar( 0.085);
+      };
+      Left =
+      {
+        ThighLength= DesignVar( 0.46); 
+        ShankLength= DesignVar( 0.45);
+        FootLength= DesignVar(0.24);
+        UpperArmLength = DesignVar( 0.30);
+        LowerArmLength = DesignVar(0.23);
+        HandLength = DesignVar( 0.182);
+        HandBreadth = DesignVar( 0.085);
+      };
+   };
+};
+
+  /// The following settings define the initial posture of the
+  /// model (e.g. at load time)
+  Main.HumanModel.Mannequin.Posture = {
+    
+    
+    PelvisThoraxExtension = 0;
+    PelvisThoraxLateralBending = 0;
+    PelvisThoraxRotation = 0;
+
+    NeckExtension = 0;
+    NeckLateralBending = 0;
+    NeckRotation = 0;
+  
+    Right = {
+
+      HipFlexion = 5;
+      HipAbduction = 0;
+      HipExternalRotation = 0;
+      KneeFlexion = 5;
+      AnklePlantarFlexion = 0;
+      SubTalarEversion = 0;
+      
+      
+    GlenohumeralFlexion = 0;
+      GlenohumeralAbduction = 5;
+      GlenohumeralExternalRotation = 0;
+      ElbowFlexion = 80;
+      ElbowPronation = 60;
+      WristFlexion = 0;
+      WristAbduction = 0;
+    
+  };
+    Left = {
+    
+      HipFlexion = 5;
+      HipAbduction = 0;
+      HipExternalRotation = 0;
+      KneeFlexion = 5;
+      AnklePlantarFlexion = 0;
+      SubTalarEversion = 0;
+
+          GlenohumeralFlexion = 0;
+      GlenohumeralAbduction = 5;
+      GlenohumeralExternalRotation = 0;
+      ElbowFlexion = 80;
+      ElbowPronation = 60;
+      WristFlexion = 0;
+      WristAbduction = 0;
+
+  };
+  
+  
+  }; // InitialPositionOfBody
+
+#define CUSTOM_CAMERA
+ 
+ Main.Studies.InverseDynamicStudy.VideoTool ={
+    CameraLookAtPoint = {0,0,1};
+    CameraDirection =    {-15.0,-1,1.5}/vnorm({-15.0,1,1.5}); 
+    CameraDistance = 6;
+    CameraFieldOfView =4;
+    VideoResolution ={1920,1080};
+    
+    Camera.Perspective =On;
+  };

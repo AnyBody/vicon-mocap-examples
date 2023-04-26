@@ -1,0 +1,354 @@
+//This files creates a bike model and adds it to the existing mocap model.
+// the model is driven by markers, but in addition to this there are soft constraints in hands and pelvis to connect 
+//to fix point. The location of these points are subject to an optimization 
+
+#define CREATE_NEW_PARAM_STUDY
+//class template for conditional contact
+#include "<ANYBODY_PATH_MODELUTILS>\FrictionContactMuscles\ConditionalContactClass.any"
+
+//Add bike model parameters to model setup section
+Main ={
+  
+  //Open environment folder and add object 
+  Main.EnvironmentModel ={
+    AnyFolder ExtraModel ={
+      
+      /// Various parameters for setting up the bicycle and the riding characteristics.
+      AnyFolder BikeParameters = {
+        
+        AnyVar CrankX = 0.0;
+        AnyVar CrankY = 0.2;
+        AnyVar CrankZ = 0.35;
+        
+        AnyVar SaddleY = 0.2;
+        AnyVar SaddleZ= 1;
+        
+        
+        AnyVar HandleBarWidth =0.4;
+        
+        AnyVar HandleBarY = 0.7;
+        AnyVar HandleBarZ= 0.5;
+        
+        // Geometry parameters
+        AnyVar PedalArmLength =0.17;  //Length of pedal arm
+        AnyVar PedalArmWidth = 0.107; //Horizontal distance between left and right connecting point between foot and pedal
+        
+        // Performance parameters
+        //NOTE cadence needs to be estimated based on mocap data here we assume it to be 80
+        AnyVar Cadence = 80.0;   //Cadence in RPM 
+        AnyVar MechOutput = 170; //Average Mechanical output over a cycle in Watt
+        
+        // The function for the crank moment is defined as Moment=Offset-Amp*cos(2*CRANK_ANGLE+Phase)
+        AnyVar T = 60/Cadence; //Cycle time
+        
+        AnyVar CrankMomentTopDeadCenter = 3.0; // Crank moment at the top dead center.
+        AnyVar CrankMomentOffset = (MechOutput*T)/(2*pi); 
+        AnyVar CrankMomentAmp = CrankMomentOffset-CrankMomentTopDeadCenter;
+        AnyVar CrankMomentPhase = -(90+15)*pi/180;
+      };
+      
+      //fixed frame for crank pos, the position is being optimized to match marker data
+      AnyFixedRefFrame CrankFixation  ={
+        Origin ={.BikeParameters.CrankX,.BikeParameters.CrankY,.BikeParameters.CrankZ};
+      };
+      
+      //fixed frame for saddle pos, the position is being optimized to match marker data
+      AnyFixedRefFrame SaddleFixation  ={
+        Origin ={.BikeParameters.CrankX,.BikeParameters.SaddleY,.BikeParameters.SaddleZ};
+        
+      };
+      
+      //fixed frame for handlebar pos, the position is being optimized to match marker data
+      AnyFixedRefFrame HandleBarFixation  ={
+        Origin ={.BikeParameters.CrankX,.BikeParameters.HandleBarY+.BikeParameters.CrankY,.BikeParameters.CrankZ+.BikeParameters.HandleBarZ};
+        
+        AnyRefNode Right ={
+          sRel={0.5*..BikeParameters.HandleBarWidth,0,0};
+        };
+        AnyRefNode Left ={
+          sRel={-0.5*..BikeParameters.HandleBarWidth,0,0};
+        };
+      };
+      
+      AnyFixedRefFrame VisualBike ={
+        
+        AnyDrawLine Line1 ={
+          p0= ..CrankFixation.Origin;
+          p1= ..SaddleFixation.Origin;      
+          Line.Thickness=0.03;
+          Line.RGB={0,0,1};
+        };
+        AnyDrawLine Line2 ={
+          p0= ..SaddleFixation.Origin;      
+          p1= ..HandleBarFixation.Origin;
+          Line.Thickness=0.03;
+          Line.RGB={0,0,1};
+        };
+        AnyDrawLine Line3 ={
+          p0= ..HandleBarFixation.Origin;
+          p1= ..CrankFixation.Origin;
+          Line.Thickness=0.03;
+          Line.RGB={0,0,1};
+        };
+        AnyDrawLine Line4 ={
+          p0= ..HandleBarFixation.Right.r;
+          p1= ..HandleBarFixation.Left.r;
+          Line.Thickness=0.02;
+          Line.RGB={1,0,0};
+        };
+        
+        AnyDrawLine Line5 ={
+          p0= ..Crank.r;
+          p1= ..Crank.RPedal.r;
+          Line.Thickness=0.01;
+          Line.RGB={0,1,0};
+        };
+        AnyDrawLine Line6 ={
+          p0= ..Crank.r;
+          p1= ..Crank.LPedal.r;
+          Line.Thickness=0.01;
+          Line.RGB={0,1,0};
+        };
+        
+      };
+      
+      
+      
+      //definiton of crank
+      AnySeg Crank = {
+
+        Mass=0.5;
+        Jii = {0.001,0.001,0.001};
+        AnyRefNode CrankJoint = { sRel = {0,0,0}; };
+        AnyRefNode RPedal = { 
+          sRel = {..BikeParameters.PedalArmWidth,..BikeParameters.PedalArmLength,0}; 
+          AnyDrawRefFrame drw ={        AnyDrawRefFrame drw ={ScaleXYZ={1,1,1}*0.1;};};
+        };      
+        
+        AnyRefNode LPedal = { 
+          sRel = {-..BikeParameters.PedalArmWidth,-..BikeParameters.PedalArmLength,0}; 
+          AnyDrawRefFrame drw ={        AnyDrawRefFrame drw ={ScaleXYZ={1,1,1}*0.1;};};
+        };      
+        
+      };//Crank
+      
+      AnyRevoluteJoint CrankJoint ={
+        Axis = x;
+        AnyFixedRefFrame &Ground = .CrankFixation;
+        AnyRefNode &Crank = .Crank.CrankJoint;     
+      };
+      
+      //This is the definiton of the crank moment
+      AnyForce CrankMoment ={
+        AnyJoint &Jnt=.CrankJoint;
+        F={.BikeParameters.CrankMomentOffset-.BikeParameters.CrankMomentAmp*cos(2*.CrankJoint.Pos[0]+ .BikeParameters.CrankMomentPhase)};
+      };
+      
+      //If having more DOF to Save add ref to the measure here
+      AnyKinMeasureOrg Extra_DOFS ={       
+        AnyKinMeasureOrg &ref=  .CrankJoint;  //the crank motion is driven by connection to feet but we need to save the motion of the crank
+      };
+    };
+  };
+  
+  #include "../ExtraOneSegModelGeneric.any"
+  
+  
+  //adds joints between human and bike these will be include in kinematic model not inverse dyn model
+  Main.ModelSetup.MocapExtraDrivers.ExtraDrivers ={
+    
+    //Make a soft kinematic driver from pelvis to saddle    
+    AnyKinEqSimpleDriver SaddleJoint ={
+      //make a weak driver markers should dominate
+      AnyFunConst WeightFunConst ={
+        Value =0.01*{1.0,1.0,1.0};
+      };
+      AnyKinLinear lin ={
+        AnyFixedRefFrame &ref12=Main.EnvironmentModel.ExtraModel.SaddleFixation;
+        AnyRefFrame &ref2=.Main.HumanModel.BodyModel.Trunk.SegmentsLumbar.PelvisSeg.TuberIschiadicumCenter;
+        
+      };
+      WeightFun ={&WeightFunConst}; 
+      DriverPos={0,0,0};
+      DriverVel={0,0,0};
+      CType={Soft,Soft,Soft};
+    };
+    
+    AnyFolder Right={
+      
+      //Make a soft kinematic driver from hand to handlebar    
+      AnyKinEqSimpleDriver HandJoint ={
+        //make a weak driver markers should dominate
+        AnyFunConst WeightFunConst ={
+          Value =0.01*{1.0,1.0,1.0};
+        };
+        AnyKinLinear lin ={
+          AnyRefFrame &ref12=Main.EnvironmentModel.ExtraModel.HandleBarFixation.Right;
+          AnyRefFrame &ref2=Main.HumanModel.BodyModel.Right.ShoulderArm.Seg.Hand.Ref.PalmJoint;
+        };
+        WeightFun ={&WeightFunConst}; 
+        DriverPos={0,0,0};
+        DriverVel={0,0,0};
+        CType={Soft,Soft,Soft};
+      };
+      
+      // This is the joint connecting the foot to the pedal. It simply
+      // specifies that the linear distances between the two must be zero
+      AnySphericalJoint PedalFootJoint = {
+        AnyRefNode &ref1= Main.EnvironmentModel.ExtraModel.Crank.RPedal;
+        AnyRefNode &ref2 = Main.HumanModel.BodyModel.Right.Leg.Seg.Foot.PedalConnectNode;
+        AnyFolder &DrawRef=Main.DrawSettings;
+      };
+      AnySeg& Ref_Foot = Main.HumanModel.BodyModel.Right.Leg.Seg.Foot;
+      Ref_Foot =       {
+        AnyRefNode PedalConnectNode =        {     
+          sRel = .Metatarsal2Contact.sRel;
+          ARel = .AnatomicalFrame.ARel;
+        };   
+      };  
+    };
+    
+    AnyFolder Left={
+      //Make a soft kinematic driver from hand to handlebar      
+      AnyKinEqSimpleDriver HandJoint ={
+        AnyFunConst WeightFunConst ={
+          Value =0.01*{1.0,1.0,1.0};
+        };
+        AnyKinLinear lin ={
+          AnyRefFrame &ref12=Main.EnvironmentModel.ExtraModel.HandleBarFixation.Left;
+          AnyRefFrame &ref2=.Main.HumanModel.BodyModel.Left.ShoulderArm.Seg.Hand.Ref.PalmJoint;
+        };
+        WeightFun ={&WeightFunConst}; 
+        DriverPos={0,0,0};
+        DriverVel={0,0,0};
+        CType={Soft,Soft,Soft};
+      };
+      
+      // This is the joint connecting the foot to the pedal. It simply
+      // specifies that the linear distances between the two must be zero
+      AnySphericalJoint PedalFootJoint = {
+        AnyRefNode &ref1= Main.EnvironmentModel.ExtraModel.Crank.LPedal;
+        AnyRefNode &ref2 = Main.HumanModel.BodyModel.Left.Leg.Seg.Foot.PedalConnectNode;
+      };
+      AnySeg& Ref_Foot = Main.HumanModel.BodyModel.Left.Leg.Seg.Foot;
+      Ref_Foot =   {
+        AnyRefNode PedalConnectNode =         {     
+          sRel = .Metatarsal2Contact.sRel;
+          ARel = .AnatomicalFrame.ARel;
+        };   
+      };  
+    };
+  };
+  
+  
+  //Open the inverse dynamic study and add driver for crank  
+  Main.Studies.InverseDynamicStudy.ModelEnvironmentConnection={
+    //this folder add reactions between human and bike
+    AnyFolder Support ={
+      AnyFolder RightHand ={
+        AnyReacForce Hand ={
+          AnyKinLinear lin ={
+            AnyRefNode &ref1= Main.EnvironmentModel.ExtraModel.HandleBarFixation.Right;
+            AnyRefNode &ref2= Main.HumanModel.BodyModel.Right.ShoulderArm.Seg.Hand.Ref.PalmJoint;
+          };
+        };
+      };
+      
+      AnyFolder LeftHand ={
+        AnyReacForce Hand ={
+          AnyKinLinear lin ={
+            AnyRefNode &ref1= Main.EnvironmentModel.ExtraModel.HandleBarFixation.Left;
+            AnyRefNode &ref2= Main.HumanModel.BodyModel.Left.ShoulderArm.Seg.Hand.Ref.PalmJoint;
+          };
+        };
+      };
+      
+      AnyFolder RightFoot ={
+        AnyReacForce Foot={
+          AnyKinLinear lin ={
+            AnyRefNode &ref1= Main.EnvironmentModel.ExtraModel.Crank.RPedal;
+            AnyRefNode &ref2= Main.HumanModel.BodyModel.Right.Leg.Seg.Foot.PedalConnectNode;
+          };
+        };
+      };
+      
+      
+      AnyFolder LeftFoot={
+        AnyReacForce Foot ={
+          AnyKinLinear lin ={
+            AnyRefNode &ref1= Main.EnvironmentModel.ExtraModel.Crank.LPedal;
+            AnyRefNode &ref2= Main.HumanModel.BodyModel.Left.Leg.Seg.Foot.PedalConnectNode   ;
+          };
+        };
+      };
+      
+      
+      AnyFolder Pelvis ={
+        ConditionalContactClass FootBallMidSupport (
+        BaseObject = Main.EnvironmentModel.ExtraModel.SaddleFixation,
+        TargetObject = Main.HumanModel.BodyModel.Trunk.SegmentsLumbar.PelvisSeg.TuberIschiadicumCenter,
+        DisplayTriggerVolume = 0,
+        DisplayTargetNode =0
+        ) = {
+          UserDefinedLimitLow = -0.3;
+          UserDefinedLimitHigh = 0.1;
+          UserDefinedRadiusLimit = 0.17;
+          Strength = 1000;
+          StaticFrictionCoefficient = 0.4;
+          NormalDirection = Z;
+          FrictionDirection1 = X;
+          FrictionDirection2 = Y;
+        };
+      };
+    };
+  };
+  
+  
+  //Add new design variables to the model
+  Main.ParameterIdentification_External  ={
+    
+    //Crank position 
+    AnyDesVar CrankX ={
+      Val =Main.EnvironmentModel.ExtraModel.BikeParameters.CrankX;
+    };
+    AnyDesVar CrankY ={
+      Val =Main.EnvironmentModel.ExtraModel.BikeParameters.CrankY;
+    };
+    
+    AnyDesVar CrankZ ={
+      Val =Main.EnvironmentModel.ExtraModel.BikeParameters.CrankZ;
+    };
+    
+    //Saddle position 
+    AnyDesVar SaddleY ={
+      Val =Main.EnvironmentModel.ExtraModel.BikeParameters.SaddleY;
+    };
+    AnyDesVar SaddleZ ={
+      Val =Main.EnvironmentModel.ExtraModel.BikeParameters.SaddleZ;
+    };
+    
+    //Handle bar position 
+    AnyDesVar HandleBarY_Right ={
+      Val =Main.EnvironmentModel.ExtraModel.BikeParameters.HandleBarY;
+    };
+    
+    AnyDesVar HandleBarWidth ={
+      Val =Main.EnvironmentModel.ExtraModel.BikeParameters.HandleBarWidth;
+    };
+    
+    AnyDesVar HandleBarZ ={
+      Val =Main.EnvironmentModel.ExtraModel.BikeParameters.HandleBarZ;
+    };
+    
+    
+  }; //Design vars
+  
+  
+};
+
+
+
+
+
+
+

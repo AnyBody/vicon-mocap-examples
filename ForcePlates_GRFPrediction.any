@@ -1,0 +1,71 @@
+
+Main.EnvironmentModel.GlobalRef ={
+   AnyRefNode FloorOffset = {
+     sRel ??= {0,0,0};
+   };
+};
+
+Main.EnvironmentModel.ForcePlates = 
+{
+  
+  
+  AnyVec3 GroundVelocity ??= {0,0,0};
+  
+  //-------- Predictive forceplate for the right leg
+  // See: #include "<ANYBODY_PATH_AMMR>/Tools/GRFPrediction/FootPlateConditionalContact.any"
+  FootPlateConditionalContact GRF_Prediction_Right(
+  NORMAL_DIRECTION = "Z",
+  NUMBER_OF_NODES = 25,
+  NODES_FOLDER = FootNodes,
+  SHOW_TRIGGER_VOLUME = ON,
+  PLATE_BASE_FRAME = Main.EnvironmentModel.GlobalRef.FloorOffset ) =  {
+    CreateFootContactNodes25 FootNodes(foot_ref = 
+    Main.HumanModel.BodyModel.Right.Leg.Seg.Foot) = {};
+    // Additional force plate settings
+    Settings =     {
+      GroundVelocity =..GroundVelocity;
+      LimitDistHigh = 0.035; // Vertical height
+    };
+  };
+  
+  
+  
+  
+  
+  
+  
+  //-------- Predictive forceplate for the left leg 
+  // See: #include "<ANYBODY_PATH_AMMR>/Tools/GRFPrediction/FootPlateConditionalContact.any"
+  FootPlateConditionalContact GRF_Prediction_Left(
+  NORMAL_DIRECTION = "Z",
+  NUMBER_OF_NODES = 25,
+  NODES_FOLDER = FootNodes,
+  SHOW_TRIGGER_VOLUME = ON,
+  PLATE_BASE_FRAME = Main.EnvironmentModel.GlobalRef.FloorOffset) =
+  {
+    CreateFootContactNodes25 FootNodes(foot_ref = 
+    Main.HumanModel.BodyModel.Left.Leg.Seg.Foot) = {};
+    
+    Settings =     {
+           GroundVelocity =..GroundVelocity;
+           LimitDistHigh = 0.035;
+    };
+  };
+  
+  
+  
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+

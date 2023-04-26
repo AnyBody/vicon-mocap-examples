@@ -1,0 +1,83 @@
+#define UpperBody
+Main.ModelSetup.SubjectSpecificData = 
+{
+
+
+
+};
+
+// This sets the Anthropometrics for all trials for this subject
+Main.HumanModel.Anthropometrics = 
+{
+     BodyMass =65;
+     BodyHeight = 1.7;   
+   
+  
+};
+
+  /// The following settings define the initial posture of the
+  /// model (e.g. at load time)
+  Main.HumanModel.Mannequin.Posture = {
+    
+    
+    PelvisThoraxExtension = 0;
+    PelvisThoraxLateralBending = 0;
+    PelvisThoraxRotation = 0;
+
+    NeckExtension = 0;
+    NeckLateralBending = 0;
+    NeckRotation = 0;
+  
+    Right = {
+
+      HipFlexion = 5;
+      HipAbduction = 0;
+      HipExternalRotation = 0;
+      KneeFlexion = 5;
+      AnklePlantarFlexion = 0;
+      SubTalarEversion = 0;
+      
+      
+    GlenohumeralFlexion = 0;
+      GlenohumeralAbduction = 5;
+      GlenohumeralExternalRotation = 0;
+      ElbowFlexion = 80;
+      ElbowPronation = 0;
+      WristFlexion = 0;
+      WristAbduction = 0;
+    
+  };
+    Left = {
+    
+      HipFlexion = 5;
+      HipAbduction = 0;
+      HipExternalRotation = 0;
+      KneeFlexion = 5;
+      AnklePlantarFlexion = 0;
+      SubTalarEversion = 0;
+
+          GlenohumeralFlexion = 0;
+      GlenohumeralAbduction = 5;
+      GlenohumeralExternalRotation = 0;
+      ElbowFlexion = 80;
+      ElbowPronation = 0;
+      WristFlexion = 0;
+      WristAbduction = 0;
+
+  };
+  
+  
+  }; // InitialPositionOfBody
+
+
+#define CUSTOM_CAMERA
+ 
+ Main.Studies.InverseDynamicStudy.VideoTool ={
+    CameraLookAtPoint = {0,0,1};
+    CameraDirection =    {-1,-15.0,1.5}/vnorm({-1,-15.0,1.5}); 
+    CameraDistance = 4;
+    CameraFieldOfView =3;
+    VideoResolution ={1920,1080};
+    
+    Camera.Perspective =On;
+  };

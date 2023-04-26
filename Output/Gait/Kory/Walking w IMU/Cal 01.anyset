@@ -1,0 +1,17 @@
+Main.HumanModel.Anthropometrics.SegmentDimensions.Left.FootLength = 0.24029509597240728;
+Main.HumanModel.Anthropometrics.SegmentDimensions.Left.ShankLength = 0.43644190290458201;
+Main.HumanModel.Anthropometrics.SegmentDimensions.Left.ThighLength = 0.44595030021773258;
+Main.HumanModel.Anthropometrics.SegmentDimensions.Right.FootLength = 0.2391098231456901;
+Main.HumanModel.Anthropometrics.SegmentDimensions.Right.ShankLength = 0.43624269989995168;
+Main.HumanModel.Anthropometrics.SegmentDimensions.Right.ThighLength = 0.4522617672793397;
+Main.HumanModel.Anthropometrics.SegmentDimensions.PelvisWidth = 0.14391945107019638;
+Main.ModelSetup.MocapDrivers.LANK.sRelOptEdit = {0.025299415009016456, -0.005521096378624607, 0.0037816187959196826};
+Main.ModelSetup.MocapDrivers.LTIB.sRelOptEdit = {-0.0006962619170776522, -0.070022496692923417, -0.0028196371989200539};
+Main.ModelSetup.MocapDrivers.LTHI.sRelOptEdit = {0.020031440899585692, 0.10360457935545439, 0.0077735167702389354};
+Main.ModelSetup.MocapDrivers.RANK.sRelOptEdit = {0.0300618550623192, -0.0098423562573803358, -0.0033668983048175823};
+Main.ModelSetup.MocapDrivers.RTIB.sRelOptEdit = {-0.0050349246900724988, 0.010537284258774416, 0.0073877502847358419};
+Main.ModelSetup.MocapDrivers.RTHI.sRelOptEdit = {0.020438561093799733, 0.00912053992348991, 0.0039858163182957271};
+Main.ModelSetup.MocapDrivers.LASI.sRelOptEdit = {0.021867671739764828, 0.0, 0.0};
+Main.ModelSetup.MocapDrivers.RASI.sRelOptEdit = {0.025488965603749959, 0.0, 0.0};
+Main.ModelSetup.MocapDrivers.RPSI.sRelOptEdit = {-0.025488965603749959, 0.0, 0.024195984132229828};
+Main.ModelSetup.MocapDrivers.LPSI.sRelOptEdit = {-0.021867671739764828, 0.0, -0.024195984132229828};

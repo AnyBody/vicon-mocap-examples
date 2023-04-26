@@ -1,0 +1,29 @@
+name: Tests
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+concurrency: 
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    # Runs on a self-hosted runner
+    runs-on: [self-hosted, linux]
+    container: ghcr.io/anybody/anybodycon-linux:7.4.4
+
+    env:
+      RLM_LICENSE_PASSWORD: ${{ secrets.LICENSE_PASSWORD }}
+      RLM_LICENSE: ${{ secrets.LICENSE_SERVER }}
+    
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Run batch processing
+        run: |
+          python batchprocess.py

@@ -1,0 +1,118 @@
+#define RIGHT_HAND_GRIP_FORCES
+#define LEFT_HAND_GRIP_FORCES
+#define CREATE_NEW_PARAM_STUDY
+#define SAVE_ALL_6DOF_FROM_BASE_OBJECT
+
+
+Main ={
+  
+  Main.ModelSetup.MocapDrivers ={
+
+    #ifndef CREATE_NEW_PARAM_STUDY
+      #define OPT_STUDY Main.Studies.ParameterIdentification
+   #else
+     #define OPT_STUDY  Main.ParameterIdentification_External
+   #endif
+    
+    CreateMarkerDriver BAT1 ( 
+    UseC3DWeightResiduals = ON,
+    MarkerPlacement=Main.EnvironmentModel.ExtraModel.Object,
+    OptX=OFF, OptY=OFF, OptZ=OFF,
+    PARAMETER_OPT_STUDY = OPT_STUDY,
+   FilterCutOffFrequency = 20,
+          UseC3DWeightResiduals=ON
+    ) = {
+      sRelOpt ={0.0,0,0};
+    };
+    
+    CreateMarkerDriver BAT2 ( 
+    UseC3DWeightResiduals = ON,
+    MarkerPlacement=Main.EnvironmentModel.ExtraModel.Object,
+    OptX=ON, OptY=ON, OptZ=ON,
+    PARAMETER_OPT_STUDY = OPT_STUDY,
+   FilterCutOffFrequency = 20,
+    UseC3DWeightResiduals=ON
+    ) = {
+      sRelOpt ={0.07,0,-0.0};
+    };
+    
+    
+    CreateMarkerDriver BAT3 ( 
+    UseC3DWeightResiduals = ON,
+    MarkerPlacement=Main.EnvironmentModel.ExtraModel.Object,
+    OptX=ON, OptY=OFF, OptZ=OFF,
+    PARAMETER_OPT_STUDY = OPT_STUDY,
+   FilterCutOffFrequency = 20,
+    UseC3DWeightResiduals=ON
+    ) = {
+      sRelOpt ={0.35,0,0};
+    };
+    
+    
+    CreateMarkerDriver BAT4 ( 
+    UseC3DWeightResiduals = ON,
+    MarkerPlacement=Main.EnvironmentModel.ExtraModel.Object,
+    OptX=ON, OptY=OFF, OptZ=ON,
+    PARAMETER_OPT_STUDY = OPT_STUDY,
+   FilterCutOffFrequency = 20,
+    UseC3DWeightResiduals=ON
+    ) = {
+      sRelOpt ={0.35,0.0,0.05};
+    };
+    
+  };
+   
+  
+  //Open environment folder and add object 
+  Main.EnvironmentModel ={
+    AnyFolder ExtraModel ={
+      //definiton of object
+      AnySeg Object = {
+        Mass=0.5;  //Guesstimate
+        Jii = {0.001,0.001,0.001};//Guesstimate
+        JaboutCoMOnOff=On;
+         AnyFunTransform3D  GeomScale = {} ;
+        AnyRefNode AnatomicalFrame ={};
+        //place CoM between club3 and club4 markers
+        sCoM =0.5* (      Main.EnvironmentModel.ExtraModel.Object.BAT1.sRel+      Main.EnvironmentModel.ExtraModel.Object.BAT1.sRel      );
+      
+     //These lines are a way to estimate the initial position of the object based on the markers, it is used for the first frame starting guess   
+        r0 = Main.ModelSetup.C3DFileData.Points.Markers.BAT1.PosInterpol(Main.ModelSetup.TrialSpecificData.tStart);
+        Axes0=RotMat(
+        Main.ModelSetup.C3DFileData.Points.Markers.BAT1.PosInterpol(Main.ModelSetup.TrialSpecificData.tStart),
+        Main.ModelSetup.C3DFileData.Points.Markers.BAT3.PosInterpol(Main.ModelSetup.TrialSpecificData.tStart),
+        Main.ModelSetup.C3DFileData.Points.Markers.BAT4.PosInterpol(Main.ModelSetup.TrialSpecificData.tStart)
+         )*RotMat(-0.5*pi,x);
+         
+         
+         AnyRefNode StartBat={sRel ={-0.4,0,0};};
+         
+          AnyDrawLine DrwLine1 ={
+          p0 = .StartBat.sRel;
+          p1 = .BAT3.sRel;
+          Line.Thickness=0.04;
+          Line.RGB={0,0,0};
+          GlobalCoord=Off;
+            
+      };
+      
+
+      };
+    
+      
+      
+      //If having more DOF to Save add ref to the measure here
+      AnyKinMeasureOrg Extra_DOFS ={        };
+    };
+  };
+
+  
+  #include "../ExtraOneSegModelGeneric.any"
+};
+
+
+  
+
+
+
+

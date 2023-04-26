@@ -1,0 +1,134 @@
+
+
+Main.EnvironmentModel.ExtraModel.Extra_DOFS ={
+  #ifdef SAVE_ALL_6DOF_FROM_BASE_OBJECT
+    AnyKinLinear Lin ={
+        AnyFixedRefFrame &ref1=Main.EnvironmentModel.GlobalRef;
+        AnySeg &ref2=Main.EnvironmentModel.ExtraModel.Object;
+    };
+      
+    AnyKinRotational Rot ={
+      AnyFixedRefFrame &ref1=Main.EnvironmentModel.GlobalRef;
+      AnySeg &ref2=Main.EnvironmentModel.ExtraModel.Object;
+      Type =RotVector;
+   };
+  #endif
+ };
+
+  
+  //open the folder for joint output  
+  Main.Studies.MarkerTracking.JointAngleOutputs ={
+    
+    //create a file with crank rotational output
+    AnyOutputFile OutputFile_ObjectPos = {
+      FileName = TEMP_PATH+"/"+ MOCAP_TEST_FILENAME_PREFIX + MOCAP_OUTPUT_FILENAME_PREFIX + Main.ModelSetup.TrialSpecificData.TrialFileName + "-ExtraObjectMovement.txt";
+      SepSign = ",";
+      SepSpaceAutoOnOff = Off;
+      Header.TitleSectionOnOff = Off;
+      Header.ConstSectionOnOff = Off;
+      Header.ConstSectionSaveOptionsOnOff = Off;
+      Header.VarSectionOnOff = Off;
+  
+      AnyVector Pos = Main.EnvironmentModel.ExtraModel.Extra_DOFS.Pos;
+      
+    };
+  };
+  
+  
+  //Open the inverse dynamic study and add driver for crank  
+  Main.Studies.InverseDynamicStudy.ModelEnvironmentConnection={
+    
+    
+    JointsAndDrivers  ={
+      //create a file with crank rotational output
+      
+      AnyKinDriver ObjectDriver = {
+        
+        #include "<ANYBODY_PATH_AMMR>/Tools/AnyMocap/InterpolateJointAngleData.any"
+        FileReader.FileName = TEMP_PATH + "/" + MOCAP_TEST_FILENAME_PREFIX + MOCAP_OUTPUT_FILENAME_PREFIX + Main.ModelSetup.TrialSpecificData.TrialFileName + "-ExtraObjectMovement.txt";
+        
+        /// The default data if no joint angles files have been generated.
+        FileReader.Data0 = repmat(
+        nDim, FileReader.Length0, 
+        {0}
+        );
+
+        AnyKinMeasure& extra =  Main.EnvironmentModel.ExtraModel.Extra_DOFS;
+       
+        //important reaction needs to be off... if not it will carry applied torque
+        Reaction.Type = repmat(nDim, Off);
+      };
+      
+    };
+    //this folder add reactions between human and bike
+    AnyFolder SupportHands ={
+  #ifdef RIGHT_HAND_GRIP_FORCES
+      AnyFolder RightHand ={
+        AnyReacForce Hand ={
+          AnyKinLinear lin ={
+            AnySeg &ref1=     Main.EnvironmentModel.ExtraModel.Object;
+            AnyRefNode &ref2= Main.HumanModel.BodyModel.Right.ShoulderArm.Seg.Hand.Ref.PalmJoint;
+          };
+           AnyKinRotational rot ={
+            AnySeg &ref1=     Main.EnvironmentModel.ExtraModel.Object;
+            AnyRefNode &ref2= Main.HumanModel.BodyModel.Right.ShoulderArm.Seg.Hand.Ref.PalmJoint;
+ Type=RotAxesAngles;
+          };
+
+          
+        };
+      };
+      #endif
+  #ifdef LEFT_HAND_GRIP_FORCES
+      AnyFolder LeftHand ={
+        AnyReacForce Hand ={
+          AnyKinLinear lin ={
+            AnySeg &ref1=     Main.EnvironmentModel.ExtraModel.Object;
+            AnyRefNode &ref2= Main.HumanModel.BodyModel.Left.ShoulderArm.Seg.Hand.Ref.PalmJoint;
+          };
+                     AnyKinRotational rot ={
+            AnySeg &ref1=     Main.EnvironmentModel.ExtraModel.Object;
+            AnyRefNode &ref2= Main.HumanModel.BodyModel.Left.ShoulderArm.Seg.Hand.Ref.PalmJoint;
+ Type=RotAxesAngles;
+          };
+
+
+          
+        };
+      };
+     #endif
+
+      
+    };
+  };
+  
+  
+
+  #ifdef CREATE_NEW_PARAM_STUDY
+  /// Study for parameter identification of segment length and marker positions. 
+  AnyOptKinStudy ParameterIdentification_External =   {    
+    Analysis ={
+      AnyOperation  &ref=Main.Studies.ParameterIdentification.KinematicStudyForParameterIdentification.Kinematics;
+    };
+  };
+  AnyOperationSequence RunParameterIdentification_External ={
+    AnyOperationSequence LoadParameters =  {
+      OPERATION_DISPLAY_PRIORITY(PriorityLow);
+      AnyOperation &ref = Main.RunAnalysis.LoadParameters;
+      AnyOperationDummy placeholder_operation= {};
+    }; 
+    
+    OPERATION_DISPLAY_PRIORITY(PriorityHigh);
+    AnyOperationSequence ParameterIdentification =  {
+      OPERATION_DISPLAY_PRIORITY(PriorityLow);
+      AnyOperation &ref =Main.ParameterIdentification_External.ParameterOptimization;
+      AnyOperationDummy placeholder_operation= {};
+    };    
+    AnyOperationSequence SaveParameters =   {
+      OPERATION_DISPLAY_PRIORITY(PriorityLow);
+      AnyOperationDummy placeholder_operation= {};
+      AnyOperation &Save_parameters_to_anyset = Main.ModelSetup.Macros.Save_parameters;
+    };    
+  };
+  #endif
+  

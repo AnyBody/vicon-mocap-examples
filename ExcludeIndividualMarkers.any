@@ -1,0 +1,158 @@
+#if (Protocol == FullBodyPlugInGait) |  (Protocol == UpperBodyPlugInGait)
+ 
+
+ #ifdef  _RFHD_EXCLUDE
+   #undef _RFHD
+ #endif
+
+ #ifdef _LFHD_EXCLUDE
+ 
+ #undef _LFHD 
+ #endif
+ 
+ #ifdef _RBHD_EXCLUDE
+ #undef _RBHD 
+ #endif
+ 
+ #ifdef _LBHD_EXCLUDE 
+ #undef _LBHD 
+ #endif
+ 
+ #ifdef _STRN_EXCLUDE 
+#undef _STRN 
+ #endif
+ 
+#ifdef _CLAV_EXCLUDE 
+#undef _CLAV 
+ #endif
+ 
+#ifdef _T10_EXCLUDE 
+#undef _T10 
+ #endif
+ 
+#ifdef _C7_EXCLUDE 
+#undef _C7 
+ #endif
+ 
+#ifdef _RSHO_EXCLUDE
+#undef _RSHO
+ #endif
+ 
+#ifdef _LSHO_EXCLUDE
+#undef _LSHO
+ #endif
+ 
+#ifdef _RUPA_EXCLUDE
+#undef _RUPA
+ #endif
+ 
+#ifdef _LUPA_EXCLUDE
+#undef _LUPA
+ #endif
+ 
+#ifdef _RELB_EXCLUDE
+#undef _RELB
+ #endif
+  
+#ifdef _LELB_EXCLUDE
+#undef _LELB
+ #endif
+ 
+#ifdef _LFRM_EXCLUDE
+#undef _LFRM
+ #endif
+ 
+#ifdef _RFRM_EXCLUDE
+#undef _RFRM
+ #endif
+ 
+#ifdef _RWRA_EXCLUDE
+#undef _RWRA
+ #endif
+ 
+#ifdef _RWRB_EXCLUDE
+#undef _RWRB
+ #endif
+ 
+#ifdef _LWRA_EXCLUDE
+#undef _LWRA
+ #endif
+ 
+#ifdef _LWRB_EXCLUDE
+#undef _LWRB
+ #endif
+ 
+#ifdef _RFIN_EXCLUDE
+#undef _RFIN
+ #endif
+ 
+#ifdef _LFIN_EXCLUDE
+#undef _LFIN
+ #endif
+ 
+#endif
+
+#ifdef _LPSI_EXCLUDE
+#undef _LPSI
+ #endif
+ 
+#ifdef _RPSI_EXCLUDE
+ #undef _RPSI
+ #endif
+ 
+ #ifdef _RASI_EXCLUDE 
+ #undef _RASI 
+ #endif
+ 
+ #ifdef _LASI_EXCLUDE 
+#undef _LASI 
+ #endif
+
+ #ifdef _RTHI_EXCLUDE 
+ #undef _RTHI 
+ #endif
+ 
+ #ifdef _RKNE_EXCLUDE 
+#undef _RKNE 
+ #endif
+ 
+#ifdef _RTIB_EXCLUDE
+#undef _RTIB
+ #endif
+ 
+#ifdef _RANK_EXCLUDE
+#undef _RANK
+ #endif
+ 
+#ifdef _RTOE_EXCLUDE
+#undef _RTOE
+ #endif
+ 
+#ifdef _RHEE_EXCLUDE
+#undef _RHEE
+ #endif
+ 
+#ifdef _LTHI_EXCLUDE
+#undef _LTHI
+ #endif
+ 
+#ifdef _LKNE_EXCLUDE
+#undef _LKNE
+ #endif
+ 
+#ifdef _LTIB_EXCLUDE
+#undef _LTIB
+ #endif
+ 
+#ifdef _LANK_EXCLUDE
+#undef _LANK
+ #endif
+ 
+#ifdef _LTOE_EXCLUDE
+#undef _LTOE
+ #endif
+ 
+#ifdef _LHEE_EXCLUDE
+#undef _LHEE
+ #endif
+ 

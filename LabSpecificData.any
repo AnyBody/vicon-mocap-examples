@@ -1,0 +1,174 @@
+Main.ModelSetup.LabSpecificData = {
+  
+ #path BODY_MODEL_CONFIG_FILE "BodyModelConfig.any"
+ 
+ 
+ #if (Protocol == FullBodyPlugInGait) | (Protocol == UpperBodyPlugInGait) | (Protocol == LowerBodyPlugInGait)
+    #path MOCAP_MARKER_PROTOCOL_FILE "PiGMarkerProtocol.any"
+ #endif
+ 
+ #if (Protocol == MarkerCluster) 
+   #path MOCAP_MARKER_PROTOCOL_FILE "ClusterMarkerProtocol.any"
+ #endif
+ 
+ #path MOCAP_EXTRA_DRIVERS_FILE "ExtraDrivers.any"
+ 
+ // The switch MOCAP_C3D_DATA_PATH can be used to specify the directory
+ // where the C3D file is stored. Defaults to the main file directory.
+ 
+ #path MOCAP_C3DSETTINGS "C3DSettings.any"
+
+ // The switch MOCAP_C3D_DATA_PATH can be used to specify the directory
+ // where the C3D file is stored. Defaults to the main file directory.
+ #path  MOCAP_C3D_DATA_PATH "Vicon Sample Data 2018"
+ 
+
+ #ifdef EXCLUDE_FORCEPLATES_AND_RESIDUALS
+  #define MOCAP_HUMAN_GROUND_RESIDUALS "None"
+ #else
+
+ #ifdef USE_GRF_PREDICTION
+  // This switch ensure that the AnyMoCap sets the appropriate settings 
+  // for the GRF prediction (e.g. residuals, solvers etc.)
+  #define MOCAP_USE_GRF_PREDICTION ON
+  #ifndef MOCAP_HUMAN_GROUND_RESIDUALS 
+    #define MOCAP_HUMAN_GROUND_RESIDUALS  "PelvisWeak"
+  #endif
+  
+     
+  // Include the GRF prediction force plates.
+  #path MOCAP_FORCE_PLATE_FILE "ForcePlates_GRFPrediction.any"
+  
+  // GRF prediction models run with more numerical stability using a second order 
+  // criterion. This is due to the big difference in strength of recruited actuators
+  // (artificial muscles) which is used as contract element under the feet 
+  // (high strength) and human-ground residuals (low strength)
+  Main.Studies.InverseDynamicStudy.InverseDynamics.Criterion.Power = 2;
+  
+ #else
+  // Use normal force plates
+  #path MOCAP_FORCE_PLATE_FILE "ForcePlates.any"
+
+  // Controls where the Human-Ground residuals (hand of god) are applied 
+  // to the models. Choises are "Trunk" or "Pelvis". 
+  #define MOCAP_HUMAN_GROUND_RESIDUALS "Pelvis"
+
+ #endif
+#endif
+ 
+ // The low-pass filter cut-off frequencies are relatively low here. This is 
+ // to compensate for the noise in the recording. 
+ // A low cut-off frequency is possible since this is a slow excersize. 
+ // For other activities use higher values and check that the filter 
+ // does not alter the actual signal. (Suitable values for normal gait are 5/10).
+ LowPassFilterSettings.MarkerFilterCutOffFrequency = 3;
+ LowPassFilterSettings.ForceFilterCutOffFrequency = 7;
+ 
+ // Disable the upper bound for muscle recruitment. This improves the stability of the model by 
+ // preventing the solver from changing if the some muscles becomes over loaded. 
+// Main.Studies.InverseDynamicStudy.InverseDynamics.Criterion.UpperBoundOnOff = Off;
+ 
+ Gravity = -9.81*{0,0,1};
+ 
+ 
+  //Sometimes Asis markers are placed on softtissue and can not be used to optimized pelvis with
+  #ifdef ASIS_MARKER_ON_SOFTTISUE
+     #define OPTIMIZE_PELVIS_WIDTH_ON_OFF OFF
+  #else 
+     #define OPTIMIZE_PELVIS_WIDTH_ON_OFF ON
+  #endif
+ 
+   // This adds different segment length as design variables to 
+  // to the parameter identification study (Main.Studies.ParameterIdentification)
+  // This allows the segment length to be optimized in based on the markers/motion
+  #ifdef UpperBody
+
+    OptimizeAnthropometricsOnOff OptimizeAntropometricsOnOff (
+      PELVIS_WIDTH = OPTIMIZE_PELVIS_WIDTH_ON_OFF , 
+        HEAD_HEIGHT = ON, 
+    TRUNK_HEIGHT= ON, 
+    NECK_LENGTH= ON, 
+    TRUNK_WIDTH =ON,
+    RIGHT_THIGH_LENGTH= ON, 
+    LEFT_THIGH_LENGTH = ON,
+    RIGHT_SHANK_LENGTH= ON, 
+    LEFT_SHANK_LENGTH = ON,
+    RIGHT_FOOT_LENGTH= ON, 
+    LEFT_FOOT_LENGTH = ON,
+    RIGHT_UPPERARM_LENGTH= ON, 
+    LEFT_UPPERARM_LENGTH = ON,
+    RIGHT_LOWERARM_LENGTH= ON, 
+    LEFT_LOWERARM_LENGTH = ON,
+    RIGHT_HAND_LENGTH= ON, 
+    LEFT_HAND_LENGTH = ON,
+    LEFT_RIGHT_SYMMETRY = ON
+  ) ={};
+
+  
+  
+  //link head height and neck length scaling together... there is no marker allowing a separation
+  Main.ModelSetup.ParameterIdentification ={
+  LinkDesignVars HeadHeight_NeckLenght ( DesVar1 =Main.Studies.ParameterIdentification.HeadHeight, DesVar2 =Main.Studies.ParameterIdentification.NeckLength,
+       Contraint_Type = EqualToZero, Coef1 = 1, Coef2= 1)={};
+    };
+  
+ #else
+   OptimizeAnthropometricsOnOff OptimizeAntropometricsOnOff (
+    PELVIS_WIDTH = OPTIMIZE_PELVIS_WIDTH_ON_OFF , 
+    HEAD_HEIGHT = OFF, 
+    TRUNK_HEIGHT= OFF, 
+    TRUNK_WIDTH =OFF,
+    RIGHT_THIGH_LENGTH= ON, 
+    LEFT_THIGH_LENGTH = ON,
+    RIGHT_SHANK_LENGTH= ON, 
+    LEFT_SHANK_LENGTH = ON,
+    RIGHT_FOOT_LENGTH= ON, 
+    LEFT_FOOT_LENGTH = ON,
+    RIGHT_UPPERARM_LENGTH= OFF, 
+    LEFT_UPPERARM_LENGTH = OFF,
+    RIGHT_LOWERARM_LENGTH= OFF, 
+    LEFT_LOWERARM_LENGTH = OFF,
+    RIGHT_HAND_LENGTH= OFF, 
+    LEFT_HAND_LENGTH = OFF,
+    LEFT_RIGHT_SYMMETRY = OFF
+  ) ={};
+
+ #endif
+ // Include code for automatic creation of videos
+ Main.ModelSetup.Macros = {
+   #include "CreateVideo.any"
+ };
+ 
+};
+
+Main.Studies.MarkerTracking.InitialConditions.PreOperation = {
+   // These Vicon examples use uses a full directory path in the TrialFilename. Hence we need to make
+   // sure the output directories exists. In AMS <7.5 directories must exist, and hence we use this 
+   // workaround to ensure they are created. 
+   AnyOperationShellExec EnsureOutputFolderExists = 
+   {
+     FileName = "cmd.exe";
+     AnyFileVar foldername = ANYBODY_PATH_OUTPUT + "/" + Main.ModelSetup.TrialSpecificData.TrialFileName;
+     Arguments = "/C set fn=" + strquote(FilePathCompleteOf(foldername))  + " && call set fn=%fn:/=\% && call mkdir %fn% && call rmdir %fn%";
+     Show = Off;Wait = Off;
+   };
+};
+
+
+Main ={
+  
+  #ifndef CUSTOM_CAMERA
+  Main.Studies.InverseDynamicStudy.VideoTool ={
+    CameraLookAtPoint = {Main.HumanModel.BodyModel.Trunk.SegmentsLumbar.PelvisSeg.r[0], Main.HumanModel.BodyModel.Trunk.SegmentsLumbar.PelvisSeg.r[1], 1};
+    CameraDirection =    {1.0,1.0,1.0}*Main.HumanModel.BodyModel.Trunk.SegmentsLumbar.PelvisSeg.Axes'; 
+  };
+  #endif
+  
+  AnyOperationSequence RunAnalysis_WithVideo ={
+    
+    AnyOperation &LoadParameters =Main.RunAnalysis.LoadParameters;
+    AnyOperation &MarkerTracking =Main.RunAnalysis.MarkerTracking;
+    AnyOperation &MakeVideo = Main.ModelSetup.CreateVideo.CreateVideo;
+    AnyOperation &SaveOutput =Main.RunAnalysis.SaveOutput;
+  };
+};

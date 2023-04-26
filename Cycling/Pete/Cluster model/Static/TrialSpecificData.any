@@ -1,0 +1,55 @@
+#define Protocol MarkerCluster
+#define ASIS_MARKER_ON_SOFTTISUE
+
+#define INCLUDE_STATIC_MARKERS
+#define STATIC_TRIAL
+Main.ModelSetup.TrialSpecificData = 
+{
+  
+  // The trial(s) from which segment scaling and marker parameters are 
+  // loaded from. This default to the current trial itself, if nothing is 
+  // specififed.
+  
+  // This is the name of the trial c3d file without extension. 
+  // Here we assume the c3d file has the same name as the mainfile directory.
+
+  TrialFileName = "Cycling\Pete\Cluster model\Static";
+  
+  // This the C3D frame where the analysis starts
+  // If not specified it defaults to the first frame of the C3D file
+  FirstFrame = 10;
+  
+  // This the C3D frame where the analysis ends
+  // If not specified it defaults the first frame of the C3D file
+  LastFrame = 10;
+
+  // tStart specifies the time of the analysis. Setting this overrides 
+  // the 'FirstFrame' value
+  //tStart = ;
+  
+  // tEnd specifies the tEnd time of the analysis. Setting this overrides 
+  // the 'LastFrame' value
+  //tEnd = ;
+  
+  // nStep specifies the number of steps used in the analysis. 
+  // If not specified it defaults to: 1+(tEnd-tStart)*C3D_video_frame_rate
+  //nStep = ;
+  
+  // The switch MOCAP_OUTPUT_FILENAME_PREFIX can be used to specify
+  // a prefix to all output files. Useful in some cases
+  // to differentiate trials. Defautls to nothing ""
+  //#define MOCAP_OUTPUT_FILENAME_PREFIX ""
+  
+  
+   // This class_template calculates the load time position and orientation of 
+   // the pelvis based on markers.
+   AutoPelvisPos AutoPos(RASIS=RGT, LASIS=LGT, BACK=PELA) = {};
+};
+
+//Add drivers needed for calibration trial it needs to have soft drivers which makes the model stand up straight...
+Main.ModelSetup.MocapExtraDrivers.ExtraDrivers ={
+      #define BM_MANNEQUIN_DRIVER_HIP_FLEXION_RIGHT ON
+    #define BM_MANNEQUIN_DRIVER_HIP_FLEXION_LEFT ON
+   Main.HumanModel.DefaultMannequinDrivers.HipDriverRightFlexion.DriverPos ={0};
+    Main.HumanModel.DefaultMannequinDrivers.HipDriverLeftFlexion.DriverPos ={0};
+};

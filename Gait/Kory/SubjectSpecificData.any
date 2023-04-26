@@ -1,0 +1,62 @@
+Main.ModelSetup.SubjectSpecificData = 
+{
+
+
+
+};
+
+// This sets the Anthropometrics for all trials for this subject
+Main.HumanModel.Anthropometrics = 
+{
+     BodyMass = 75;
+     BodyHeight = 1.829;   
+   
+   
+};
+
+// This sets load time arm positions for all trials for this subject.
+Main.HumanModel.Mannequin.Posture =  
+{
+    Left =  
+    {
+      SternoClavicularProtraction = -20.5;
+      SternoClavicularElevation = 12.5;
+      
+      GlenohumeralFlexion = 30;
+      GlenohumeralAbduction =  0;
+      GlenohumeralExternalRotation =  -65;
+      ElbowFlexion =  120;
+      ElbowPronation =  0;
+      WristFlexion =  0;
+      WristAbduction =  0;
+      
+    };
+    
+    Right =  
+    {
+      SternoClavicularProtraction = -20.7;
+      SternoClavicularElevation = 12.5;
+      
+      GlenohumeralFlexion =  30;
+      GlenohumeralAbduction =  0;
+      GlenohumeralExternalRotation =  -70;
+      ElbowFlexion = 120;
+      ElbowPronation =  0;
+      WristFlexion =  0;
+      WristAbduction = 0;
+    };
+
+
+};
+
+#define CUSTOM_CAMERA
+ 
+ Main.Studies.InverseDynamicStudy.VideoTool ={
+    CameraLookAtPoint = {0,0,1};
+    CameraDirection =    {-1,-15.0,1.5}/vnorm({-1,-15.0,1.5}); 
+    CameraDistance = 4;
+    CameraFieldOfView =4;
+    VideoResolution ={1920,1080};
+    
+    Camera.Perspective =On;
+  };

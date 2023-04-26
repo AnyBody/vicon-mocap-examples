@@ -1,0 +1,57 @@
+
+
+Main ={
+
+  AnyFixedRefFrame Global ={
+  AnyDrawLine Line1 ={
+  p0 = Main.ModelSetup.C3DFileData.Points.Markers.Table_58_Table1.PosInterpol(Main.ModelSetup.TrialSpecificData.tStart);
+  p1 = Main.ModelSetup.C3DFileData.Points.Markers.Table_58_Table2.PosInterpol(Main.ModelSetup.TrialSpecificData.tStart);
+Line.Thickness=0.015  ;Line.RGB={0,1,0};
+};
+  AnyDrawLine Line2 ={
+  p0 = Main.ModelSetup.C3DFileData.Points.Markers.Table_58_Table2.PosInterpol(Main.ModelSetup.TrialSpecificData.tStart);
+  p1 = Main.ModelSetup.C3DFileData.Points.Markers.Table_58_Table3.PosInterpol(Main.ModelSetup.TrialSpecificData.tStart);
+Line.Thickness=0.015  ;Line.RGB={0,1,0};
+  };
+  AnyDrawLine Line3 ={
+  p0 = Main.ModelSetup.C3DFileData.Points.Markers.Table_58_Table3.PosInterpol(Main.ModelSetup.TrialSpecificData.tStart);
+  p1 = Main.ModelSetup.C3DFileData.Points.Markers.Table_58_Table4.PosInterpol(Main.ModelSetup.TrialSpecificData.tStart);
+Line.Thickness=0.015  ;Line.RGB={0,1,0};
+  };
+  AnyDrawLine Line4 ={
+  p0 = Main.ModelSetup.C3DFileData.Points.Markers.Table_58_Table4.PosInterpol(Main.ModelSetup.TrialSpecificData.tStart);
+  p1 = Main.ModelSetup.C3DFileData.Points.Markers.Table_58_Table1.PosInterpol(Main.ModelSetup.TrialSpecificData.tStart);
+Line.Thickness=0.015  ;Line.RGB={0,1,0};
+  };
+
+    AnyDrawLine Net_Line1 ={
+  p0 = Main.ModelSetup.C3DFileData.Points.Markers.Table_58_Table5.PosInterpol(Main.ModelSetup.TrialSpecificData.tStart);
+  p1 = Main.ModelSetup.C3DFileData.Points.Markers.Table_58_Table6.PosInterpol(Main.ModelSetup.TrialSpecificData.tStart);
+Line.Thickness=0.015  ;Line.RGB={1,1,1};
+
+};
+    AnyDrawLine Net_Line2 ={
+  p0 = Main.ModelSetup.C3DFileData.Points.Markers.Table_58_Table6.PosInterpol(Main.ModelSetup.TrialSpecificData.tStart);
+  p1 = Main.ModelSetup.C3DFileData.Points.Markers.Table_58_Table7.PosInterpol(Main.ModelSetup.TrialSpecificData.tStart);
+Line.Thickness=0.015  ;Line.RGB={1,1,1};
+
+};    AnyDrawLine Net_Line3 ={
+  p0 = Main.ModelSetup.C3DFileData.Points.Markers.Table_58_Table7.PosInterpol(Main.ModelSetup.TrialSpecificData.tStart);
+  p1 = Main.ModelSetup.C3DFileData.Points.Markers.Table_58_Table8.PosInterpol(Main.ModelSetup.TrialSpecificData.tStart);
+Line.Thickness=0.015  ;Line.RGB={1,1,1};
+
+};    AnyDrawLine Net_Line4 ={
+  p0 = Main.ModelSetup.C3DFileData.Points.Markers.Table_58_Table8.PosInterpol(Main.ModelSetup.TrialSpecificData.tStart);
+  p1 = Main.ModelSetup.C3DFileData.Points.Markers.Table_58_Table5.PosInterpol(Main.ModelSetup.TrialSpecificData.tStart);
+Line.Thickness=0.015  ;Line.RGB={1,1,1};
+  };  
+  
+}; 
+};
+
+
+  
+
+
+
+
