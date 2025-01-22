@@ -174,11 +174,11 @@ UseC3DWeightResiduals=ON
 #endif
 
 //LinkDesignVars BHD_X_Sym ( DesVar1 =Main.Studies.ParameterIdentification.RBHD_X, DesVar2 =Main.Studies.ParameterIdentification.LBHD_X,
-//Contraint_Type = EqualToZero, Coef1 = 1, Coef2= 1)={};
+//Constraint_Type = EqualToZero, Coef1 = 1, Coef2= 1)={};
 
 
 LinkDesignVars BHD_Z_Sym ( DesVar1 =Main.Studies.ParameterIdentification.RBHD_Z, DesVar2 =Main.Studies.ParameterIdentification.LBHD_Z,
-Contraint_Type = EqualToZero, Coef1 = 1, Coef2= -1)={};
+Constraint_Type = EqualToZero, Coef1 = 1, Coef2= -1)={};
 
 
 //// Thorax
@@ -776,7 +776,7 @@ UseC3DWeightResiduals=ON
 
 
 LinkDesignVars RWand ( DesVar1 =Main.Studies.ParameterIdentification.RWRA_Y, DesVar2 =Main.Studies.ParameterIdentification.RWRB_Y,
-Contraint_Type = EqualToZero, Coef1 = 1, Coef2= -1)={};
+Constraint_Type = EqualToZero, Coef1 = 1, Coef2= -1)={};
 
 
 #ifdef _LWRA
@@ -807,7 +807,7 @@ UseC3DWeightResiduals=ON
 
 
 LinkDesignVars LWand (DesVar1 =Main.Studies.ParameterIdentification.LWRA_Y, DesVar2 =Main.Studies.ParameterIdentification.LWRB_Y,
-Contraint_Type = EqualToZero, Coef1 = 1, Coef2= -1)={};
+Constraint_Type = EqualToZero, Coef1 = 1, Coef2= -1)={};
 
 
 #ifdef _RFIN

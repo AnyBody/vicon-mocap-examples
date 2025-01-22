@@ -109,7 +109,7 @@ Main.ModelSetup.LabSpecificData = {
   //link head height and neck length scaling together... there is no marker allowing a separation
   Main.ModelSetup.ParameterIdentification ={
   LinkDesignVars HeadHeight_NeckLenght ( DesVar1 =Main.Studies.ParameterIdentification.HeadHeight, DesVar2 =Main.Studies.ParameterIdentification.NeckLength,
-       Contraint_Type = EqualToZero, Coef1 = 1, Coef2= 1)={};
+       Constraint_Type = EqualToZero, Coef1 = 1, Coef2= 1)={};
     };
   
  #else
